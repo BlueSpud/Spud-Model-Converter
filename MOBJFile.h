@@ -18,6 +18,17 @@
 #define COLLISION_TOKEN 0x01
 #define NEW_MATERIAL_TOKEN 0xFF
 
+
+/******************************************************************************
+ *  Declaration for index struct                                              *
+ ******************************************************************************/
+
+struct MIndex {
+
+    size_t x = 0, y = 0, z = 0;
+
+};
+
 /******************************************************************************
  *  Declaration for vertex struct                                             *
  ******************************************************************************/
@@ -28,6 +39,7 @@ struct MVertex {
     glm::vec3 normal;
     glm::vec2 tex_coord;
     glm::vec3 tangent;
+    int vertex_index;
 
 };
 
@@ -56,11 +68,11 @@ class MOBJFile {
 
     private:
 
-        int getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord);
+        size_t getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord);
 
         glm::vec3 mins, maxes;
-        std::vector<MVertex> vertices;
-        std::vector<std::vector<glm::ivec3>> indicies;
+        std::map<size_t, MVertex> vertices;
+        std::vector<std::vector<MIndex>> indicies;
         unsigned int total_face_count = 0;
 
         std::vector<MMaterial> materials;

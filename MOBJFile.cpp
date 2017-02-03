@@ -1,33 +1,30 @@
 #include "MOBJFile.h"
 
+std::hash<std::string> hasher;
+
 /******************************************************************************
  *  Functions for indexing                                                    *
  ******************************************************************************/
 
-int MOBJFile::getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord) {
+size_t MOBJFile::getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord) {
 
-    for (int i = 1; i < vertices.size(); i++) {
+    // Hash the vertex
+    size_t hash = hasher(std::to_string(_position.x) + std::to_string(_position.y) + std::to_string(_position.z) +
+                         std::to_string(_normal.x) + std::to_string(_normal.y) + std::to_string(_normal.z) +
+                         std::to_string(_tex_coord.x) + std::to_string(_tex_coord.y));
 
-            // Check for position, normal and tex corod
-            if (_position == vertices[i].position && _normal == vertices[i].normal && _tex_coord == vertices[i].tex_coord) {
+    if (vertices.count(hash))
+        return hash;
 
-                // Found the vertex, return its index
-                return i;
+    // Didnt find, add new vertex
+    MVertex new_vertex;
+    new_vertex.position = glm::vec3(_position);
+    new_vertex.normal = glm::vec3(_normal);
+    new_vertex.tex_coord = glm::vec2(_tex_coord);
 
-            }
+    vertices[hash] = new_vertex;
 
-        }
-
-        // If we didnt find the vertex, that means that this one was unique and we need to add it
-        vertices.push_back(MVertex());
-        MVertex& new_vertex = vertices.back();
-
-        new_vertex.position = _position;
-        new_vertex.normal = _normal;
-        new_vertex.tex_coord = _tex_coord;
-
-        // Return the index of the last vertex
-        return (int)vertices.size() - 1;
+    return hash;
 
 }
 
@@ -44,6 +41,8 @@ void MOBJFile::loadFile(const QString& path) {
        std::vector<glm::vec3>_positions;
        std::vector<glm::vec3>_normals;
        std::vector<glm::vec2>_tex_coords;
+
+       vertices = std::map<size_t, MVertex>();
 
        // Storage and required objects for indicy parsing
        std::map<std::string, std::vector<std::string>> indices_map;
@@ -136,7 +135,7 @@ void MOBJFile::loadFile(const QString& path) {
        while (i != indices_map.end()) {
 
            // Create a new vector to store the indicies in
-           std::vector<glm::ivec3> indicies_vector;
+           std::vector<MIndex> indicies_vector;
 
            // Create a material
            MMaterial new_material;
@@ -145,7 +144,7 @@ void MOBJFile::loadFile(const QString& path) {
 
            for (int j = 0; j < i->second.size(); j++) {
 
-               glm::ivec3 new_indicies;
+               MIndex new_indicies;
 
                // Get the data in .obj format for indicies
                glm::ivec3 indicies_vertex, indicies_normal, indicies_tex;
@@ -157,8 +156,6 @@ void MOBJFile::loadFile(const QString& path) {
                new_indicies.x = getVertexIndex(_positions[indicies_vertex.x], _normals[indicies_normal.x], _tex_coords[indicies_tex.x]);
                new_indicies.y = getVertexIndex(_positions[indicies_vertex.y], _normals[indicies_normal.y], _tex_coords[indicies_tex.y]);
                new_indicies.z = getVertexIndex(_positions[indicies_vertex.z], _normals[indicies_normal.z], _tex_coords[indicies_tex.z]);
-
-               std::cout << "Indexed a face\n";
 
                // Calculate the tangent
                glm::vec3 edge1 = _positions[indicies_vertex.y] - _positions[indicies_vertex.x];
@@ -186,8 +183,8 @@ void MOBJFile::loadFile(const QString& path) {
        }
 
        // Tangents are just averages, normalize them
-       for (int i = 0; i < vertices.size(); i++)
-           vertices[i].tangent = glm::normalize(vertices[i].tangent);
+       for (std::map<size_t, MVertex>::iterator i = vertices.begin(); i != vertices.end(); i++)
+           i->second.tangent = glm::normalize(i->second.tangent);
 
        std::cout << "Read " << _positions.size() - 1 << " vertex positions from .obj\n";
        std::cout << "Needed a total of " << vertices.size() << " unique verticies\n";
@@ -215,21 +212,27 @@ void MOBJFile::saveFile(const QString& path) {
         out_file_stream.write((char*)&vertex_count, sizeof(unsigned int));
 
         // Write out the verticies
-        for (int j = 0; j < vertices.size(); j++) {
+        int vertex_index = 0;
+        for (std::map<size_t, MVertex>::iterator i = vertices.begin(); i != vertices.end(); i++) {
 
             // Write the position
-            out_file_stream.write((char*)&vertices[j].position, sizeof(glm::vec3));
+            out_file_stream.write((char*)&i->second.position, sizeof(glm::vec3));
 
             // Write out the normal
-            out_file_stream.write((char*)&vertices[j].normal, sizeof(glm::vec3));
+            out_file_stream.write((char*)&i->second.normal, sizeof(glm::vec3));
 
             // Write out the tangent
-            out_file_stream.write((char*)&vertices[j].tangent, sizeof(glm::vec3));
+            out_file_stream.write((char*)&i->second.tangent, sizeof(glm::vec3));
 
             // Write out the tex_coord
-            out_file_stream.write((char*)&vertices[j].tex_coord, sizeof(glm::vec2));
+            out_file_stream.write((char*)&i->second.tex_coord, sizeof(glm::vec2));
+
+            i->second.vertex_index = vertex_index;
+            vertex_index++;
 
         }
+
+        std::cout << "Wrote " << vertex_index << std::endl;
 
         int token;
 
@@ -250,31 +253,36 @@ void MOBJFile::saveFile(const QString& path) {
             out_file_stream.write((char*)&index_count, sizeof(unsigned int));
 
             // Write the indicies
-            for (int j = 0; j < indicies[i].size(); j++)
-                out_file_stream.write((char*)&indicies[i][j], sizeof(glm::vec3));
+            for (int j = 0; j < indicies[i].size(); j++) {
+
+                 MIndex& hashed = indicies[i][j];
+                 glm::ivec3 unhashed = glm::ivec3(vertices[hashed.x].vertex_index, vertices[hashed.y].vertex_index, vertices[hashed.z].vertex_index);
+
+                out_file_stream.write((char*)&unhashed, sizeof(glm::ivec3));
+            }
 
         }
 
         // If we have a collision model, write out a collision token
-        if (collision_model) {
+//        if (collision_model) {
 
-            token = COLLISION_TOKEN;
-            out_file_stream.write((char*)&token, sizeof(int));
+//            token = COLLISION_TOKEN;
+//            out_file_stream.write((char*)&token, sizeof(int));
 
-            // Write out the verticies
-            unsigned int collision_vertex_count = (unsigned int)collision_model->vertices.size();
-            out_file_stream.write((char*)&collision_vertex_count, sizeof(unsigned int));
+//            // Write out the verticies
+//            unsigned int collision_vertex_count = (unsigned int)collision_model->vertices.size();
+//            out_file_stream.write((char*)&collision_vertex_count, sizeof(unsigned int));
 
-            for (int i = 0; i < collision_model->vertices.size(); i++)
-                out_file_stream.write((char*)&collision_model->vertices[i].position, sizeof(glm::vec3));
+//            for (int i = 0; i < collision_model->vertices.size(); i++)
+//                out_file_stream.write((char*)&collision_model->vertices[i].position, sizeof(glm::vec3));
 
-            // For all the materials, write out their indieis
-            out_file_stream.write((char*)&collision_model->total_face_count, sizeof(unsigned int));
-            for (int i = 0; i < collision_model->indicies.size(); i++)
-                for (int j = 0; j < collision_model->indicies[i].size(); j++)
-                    out_file_stream.write((char*)&collision_model->indicies[i][j], sizeof(glm::vec3));
+//            // For all the materials, write out their indieis
+//            out_file_stream.write((char*)&collision_model->total_face_count, sizeof(unsigned int));
+//            for (int i = 0; i < collision_model->indicies.size(); i++)
+//                for (int j = 0; j < collision_model->indicies[i].size(); j++)
+//                    out_file_stream.write((char*)&collision_model->indicies[i][j], sizeof(glm::vec3));
 
-        }
+//        }
 
         // Write out an end of file token
         token = END_OF_FILE_TOKEN;

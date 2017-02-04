@@ -166,10 +166,10 @@ void MOBJFile::loadFile(const QString& path) {
 
                float f = 1.0f / (d_UV1.x * d_UV2.y - d_UV1.y * d_UV2.x);
 
-               if (!std::isfinite(f))
-                   f = 1.0;
-
                glm::vec3 tangent = glm::normalize((edge1 * d_UV2.y - edge2 * d_UV1.y) * f);
+
+               if (!std::isfinite(glm::length(tangent)))
+                   tangent = edge1;
 
                // Add the tangent on for all of the vertices
                vertices[new_indicies.x].tangent += tangent;

@@ -162,9 +162,12 @@ void MOBJFile::loadFile(const QString& path) {
                glm::vec3 edge2 = _positions[indicies_vertex.z] - _positions[indicies_vertex.x];
 
                glm::vec2 d_UV1 = _tex_coords[indicies_tex.y] - _tex_coords[indicies_tex.x];
-               glm::vec2 d_UV2 = _tex_coords[indicies_tex.z] - _tex_coords[indicies_tex.x];
+               glm::vec2 d_UV2 = _tex_coords[indicies_tex.z] - _tex_coords[indicies_tex.y];
 
                float f = 1.0f / (d_UV1.x * d_UV2.y - d_UV1.y * d_UV2.x);
+
+               if (!std::isfinite(f))
+                   f = 1.0;
 
                glm::vec3 tangent = glm::normalize((edge1 * d_UV2.y - edge2 * d_UV1.y) * f);
 

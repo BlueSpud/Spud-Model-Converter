@@ -30,7 +30,7 @@ void MMainWindow::showEvent(QShowEvent* event) {
 
     QMainWindow::showEvent(event);
 
-    while (true) {
+    while (!resource_path.length()) {
 
         // Tell the user they need to locate the directory
         QMessageBox find_directory_dialog;
@@ -72,13 +72,21 @@ void MMainWindow::openNewFile() {
     // Open a file dialog looking for a .obj file
     QString file_to_load = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                     QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).first(),
-                                                    tr("Models (*.obj)"));
+                                                    tr("Models (*.obj *.dae)"));
 
     // Set the name of the file
     ui->file_name_label->setText(file_to_load);
 
-    // Pass this into the OBJ loader
-    file = new MOBJFile();
+    // Load up a file
+    QString extension = file_to_load.section(file_to_load.length() - 4, file_to_load.length());
+    std::cout << extension.toStdString() << std::endl;
+
+    if (extension.compare(extension, "obj"))
+        file = new MOBJFile();
+
+    if (extension.compare(extension, "dae"))
+        file = new MDAEFile();
+
     file->loadFile(file_to_load);
 
     // Get the material count from the model
@@ -166,6 +174,7 @@ void MMainWindow::chooseMaterial() {
         }
 
     }
+
 }
 
 void MMainWindow::chooseCollision() {

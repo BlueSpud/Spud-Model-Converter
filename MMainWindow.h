@@ -5,6 +5,7 @@
 #include <QModelIndex>
 
 #include "MOBJFile.h"
+#include "MDAEFile.h"
 
 namespace Ui { class MMainWindow; }
 
@@ -39,7 +40,7 @@ class MMainWindow : public QMainWindow {
          Ui::MMainWindow *ui;
 
          static QString resource_path;
-         MOBJFile* file;
+         MFile* file;
 
          QModelIndex selected_material_index;
          MMaterial* selected_material;

@@ -246,6 +246,38 @@ void MFile::saveFile(const QString& path) {
 
 }
 
+void MFile::saveAnimation(const QString& path) {
+
+    std::ofstream out_file_stream(path.toStdString(), std::ios::binary);
+
+    // Write out number of bones
+    unsigned int bone_count = animation.size();
+    out_file_stream.write((char*)&bone_count, sizeof(unsigned int));
+
+    for (int i = 0; i < animation.size(); i++) {
+
+        // Write out the number of keyframes
+        unsigned int keyframe_count = animation[i].size();
+        out_file_stream.write((char*)&keyframe_count, sizeof(unsigned int));
+
+        // Write out each keyfram
+        for (int j = 0; j < animation[i].size(); j++) {
+
+             // Write out the tweening type
+             out_file_stream.write((char*)&animation[i][j].tweener, sizeof(MAnimationTweening));
+
+             // Write out what time this keyframe is
+            out_file_stream.write((char*)&animation[i][j].time, sizeof(float));
+
+            // Write out the matrix
+            out_file_stream.write((char*)&animation[i][j].matrix, sizeof(glm::mat4));
+
+        }
+
+    }
+
+}
+
 int MFile::getMaterialCount() { return indicies.size(); }
 MMaterial* MFile::getMaterial(int material) { return &materials[material]; }
 

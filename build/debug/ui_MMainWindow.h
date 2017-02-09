@@ -29,6 +29,7 @@ class Ui_MMainWindow
 public:
     QAction *actionOpen;
     QAction *actionSave_File;
+    QAction *actionSave_Animation;
     QWidget *centralWidget;
     QListView *listView;
     QLabel *material_list_label;
@@ -50,6 +51,8 @@ public:
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         actionSave_File = new QAction(MMainWindow);
         actionSave_File->setObjectName(QStringLiteral("actionSave_File"));
+        actionSave_Animation = new QAction(MMainWindow);
+        actionSave_Animation->setObjectName(QStringLiteral("actionSave_Animation"));
         centralWidget = new QWidget(MMainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         listView = new QListView(centralWidget);
@@ -91,6 +94,7 @@ public:
         menuBar->addAction(menuEdit->menuAction());
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave_File);
+        menuFile->addAction(actionSave_Animation);
 
         retranslateUi(MMainWindow);
         QObject::connect(actionOpen, SIGNAL(triggered()), MMainWindow, SLOT(openNewFile()));
@@ -98,6 +102,7 @@ public:
         QObject::connect(listView, SIGNAL(clicked(QModelIndex)), MMainWindow, SLOT(selectMaterial(QModelIndex)));
         QObject::connect(pushButton_2, SIGNAL(clicked()), MMainWindow, SLOT(chooseMaterial()));
         QObject::connect(collision_button, SIGNAL(clicked()), MMainWindow, SLOT(chooseCollision()));
+        QObject::connect(actionSave_Animation, SIGNAL(triggered()), MMainWindow, SLOT(saveAnimation()));
 
         QMetaObject::connectSlotsByName(MMainWindow);
     } // setupUi
@@ -107,6 +112,7 @@ public:
         MMainWindow->setWindowTitle(QApplication::translate("MMainWindow", "MMainWindow", 0));
         actionOpen->setText(QApplication::translate("MMainWindow", "Open File...", 0));
         actionSave_File->setText(QApplication::translate("MMainWindow", "Save File...", 0));
+        actionSave_Animation->setText(QApplication::translate("MMainWindow", "Save Animation...", 0));
         material_list_label->setText(QApplication::translate("MMainWindow", "<b>Materials", 0));
         collision_label->setText(QApplication::translate("MMainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Collision</span></p></body></html>", 0));
         collision_button->setText(QApplication::translate("MMainWindow", "Choose Collision", 0));

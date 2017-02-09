@@ -39,7 +39,7 @@ struct MVertex {
 };
 
 /******************************************************************************
- *  Declaration for bone struct                                              *
+ *  Declaration for bone struct                                               *
  ******************************************************************************/
 
 struct MBone {
@@ -49,6 +49,25 @@ struct MBone {
     glm::mat4 bind_matrix;
 
     std::string name;
+
+};
+
+/******************************************************************************
+ *  Declaration for animation data                                            *
+ ******************************************************************************/
+
+enum MAnimationTweening {
+
+    MAnimationTweeningNormal
+
+};
+
+struct MAnimationKeyFrame {
+
+    MAnimationTweening tweener;
+    float time = 0.0;
+
+    glm::mat4 matrix;
 
 };
 
@@ -89,6 +108,9 @@ class MFile {
 
         virtual void loadFile(const QString& path) = 0;
         virtual void saveFile(const QString& path);
+        virtual void saveAnimation(const QString& path);
+
+        const std::vector<std::vector<MAnimationKeyFrame>> getAnimation() { return animation; }
 
     protected:
 
@@ -96,6 +118,8 @@ class MFile {
         size_t getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord, glm::vec4& _bone_indicies, glm::vec4& _bone_weights);
         void calculateTangent(MIndex& index);
         void finalizeTangents();
+
+        int findBoneNamed(const std::string& name);
 
         std::map<size_t, MVertex> vertices;
         unsigned int total_face_count = 0;
@@ -111,7 +135,7 @@ class MFile {
         std::vector<MBone> bones;
         glm::mat4 global_bind_pos;
 
-        int findBoneNamed(const std::string& name);
+        std::vector<std::vector<MAnimationKeyFrame>> animation;
 };
 
 #endif // MFILE_H

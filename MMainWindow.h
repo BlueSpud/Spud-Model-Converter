@@ -29,6 +29,7 @@ class MMainWindow : public QMainWindow {
 
         void openNewFile();
         void saveFile();
+        void saveAnimation();
 
         void selectMaterial(QModelIndex index);
         void chooseMaterial();

@@ -130,6 +130,7 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionSave_File"/>
+    <addaction name="actionSave_Animation"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -149,6 +150,11 @@
     <string>Save File...</string>
    </property>
   </action>
+  <action name="actionSave_Animation">
+   <property name="text">
+    <string>Save Animation...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
@@ -164,7 +170,7 @@
      <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>355</x>
+     <x>349</x>
      <y>224</y>
     </hint>
    </hints>
@@ -233,6 +239,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSave_Animation</sender>
+   <signal>triggered()</signal>
+   <receiver>MMainWindow</receiver>
+   <slot>saveAnimation()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>349</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>openNewFile()</slot>
@@ -240,5 +262,6 @@
   <slot>selectMaterial(QModelIndex)</slot>
   <slot>chooseMaterial()</slot>
   <slot>chooseCollision()</slot>
+  <slot>saveAnimation()</slot>
  </slots>
 </ui>

@@ -113,26 +113,11 @@ void MDAEFile::loadFile(const QString& path) {
                 bone_indicies.push_back(findBoneNamed(bone_names[i]));
 
             // Lastly weget the bind poses for the matricies
-            stream = std::stringstream(bind_poses->getChildrenOfType("float_array")[0]->contents);
+            std::vector<glm::mat4> bind_matrices = parseMatrices(bind_poses->getChildrenOfType("float_array")[0]->contents, bone_names.size());
 
-            for (int i = 0; i < bone_names.size(); i++) {
-
-                // Parse the matrix, we cant use the function because theyre all together
-                std::string matrix_f;
-                float matrix[16];
-
-                for (int m = 0; m < 16; m++) {
-
-                    std::getline(stream, matrix_f, ' ');
-                    matrix[m] = atof(matrix_f.c_str());
-
-                }
-
-                // Give the bone the matrix
-                bones[bone_indicies[i]].bind_matrix = glm::make_mat4(matrix);
-
-            }
-
+             // Give the bone the matrix
+            for (int i = 0; i < bone_names.size(); i++)
+                bones[bone_indicies[i]].bind_matrix = bind_matrices[i];
 
             // Get the weights
             std::vector<float> weight_values;
@@ -199,6 +184,77 @@ void MDAEFile::loadFile(const QString& path) {
 
                 _bone_indicies.push_back(vertex_indicies);
                 _bone_weights.push_back(vertex_weights);
+
+            }
+
+            // Try to parse the animation if we can
+            MXMLNode* animation_node = parser.nodes[0].getChildrenOfType("library_animations")[0];
+
+            if (animation_node) {
+
+                // There was an animation
+                animation = std::vector<std::vector<MAnimationKeyFrame>>();
+
+                std::vector<MXMLNode*> bone_animation_nodes = animation_node->getChildrenOfType("animation");
+                std::vector<MXMLNode*> bone_animation_sorted;
+                bone_animation_sorted.resize(bone_animation_nodes.size());
+
+                for (int i = 0; i < bone_animation_nodes.size(); i++) {
+
+                    // Sort the bones array for simplicity
+                    for (int j = 0; j < bone_animation_nodes.size(); j++) {
+
+                        if (bone_animation_nodes[j]->getArgument("id").find(bone_names[i] + "_pose_matrix") != std::string::npos) {
+
+                            bone_animation_sorted[bone_indicies[i]] = bone_animation_nodes[j];
+                            break;
+
+                        }
+
+                    }
+
+                }
+
+                // The nodes are sorted, now we can parse the key frames
+                for (int i = 0; i < bone_animation_nodes.size(); i++) {
+
+                    animation.push_back(std::vector<MAnimationKeyFrame>());
+
+                    // Get all of the sources
+                    std::vector<MXMLNode*> sources = bone_animation_sorted[i]->getChildrenOfType("source");
+
+                    MXMLNode* time_node;
+                    MXMLNode* matrix_node;
+
+                    // Figure out which source is which
+                    for (int j = 0; j < sources.size(); j++) {
+
+                        if (sources[j]->getArgument("id").find("input") != std::string::npos)
+                             time_node = sources[j]->getChildrenOfType("float_array")[0];
+
+                        if (sources[j]->getArgument("id").find("output") != std::string::npos)
+                             matrix_node = sources[j]->getChildrenOfType("float_array")[0];
+
+                    }
+
+                    // Parse the times
+                    stream = std::stringstream(time_node->contents);
+                    std::string time;
+
+                    while (std::getline(stream, time, ' ')) {
+
+                        // Make a new key frame and then set the time
+                        animation[i].push_back(MAnimationKeyFrame());
+                        animation[i].back().time = atof(time.c_str());
+
+                    }
+
+                    // Get all of the matrices
+                    std::vector<glm::mat4> animation_matrices = parseMatrices(matrix_node->contents, animation[i].size());
+                    for (int j = 0; j < animation[i].size(); j++)
+                        animation[i][j].matrix = animation_matrices[j];
+
+                }
 
             }
 
@@ -397,6 +453,34 @@ glm::mat4 MDAEFile::parseMatrix(const std::string& string) {
     }
 
      return glm::make_mat4(matrix);
+
+}
+
+std::vector<glm::mat4> MDAEFile::parseMatrices(const std::string& string, int count) {
+
+    // Lastly weget the bind poses for the matricies
+    std::stringstream stream = std::stringstream(string);
+    std::vector<glm::mat4> matrices;
+
+    for (int i = 0; i < count; i++) {
+
+        // Parse the matrix, we cant use the function because theyre all together
+        std::string matrix_f;
+        float matrix[16];
+
+        for (int m = 0; m < 16; m++) {
+
+            std::getline(stream, matrix_f, ' ');
+            matrix[m] = atof(matrix_f.c_str());
+
+        }
+
+        // Give the bone the matrix
+       matrices.push_back(glm::make_mat4(matrix));
+
+    }
+
+    return matrices;
 
 }
 

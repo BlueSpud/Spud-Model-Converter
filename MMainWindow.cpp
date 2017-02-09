@@ -78,13 +78,14 @@ void MMainWindow::openNewFile() {
     ui->file_name_label->setText(file_to_load);
 
     // Load up a file
-    QString extension = file_to_load.section(file_to_load.length() - 4, file_to_load.length());
-    std::cout << extension.toStdString() << std::endl;
+    std::string path_as_std_string = file_to_load.toStdString();
+    std::string extension = path_as_std_string.substr(path_as_std_string.length() - 3, 3);
+    std::cout << extension << std::endl;
 
-    if (extension.compare(extension, "obj"))
+    if (!extension.compare("obj"))
         file = new MOBJFile();
 
-    if (extension.compare(extension, "dae"))
+    if (!extension.compare("dae"))
         file = new MDAEFile();
 
     file->loadFile(file_to_load);
@@ -117,6 +118,19 @@ void MMainWindow::saveFile() {
 
     if (file_name.length() && selected_material != nullptr)
         file->saveFile(file_name);
+
+}
+
+void MMainWindow::saveAnimation() {
+
+    // Open up a dialog to figure out where to save it
+    QString file_name = QFileDialog::getSaveFileName(this, tr("Save File"),
+                               resource_path + "/Models/animation.sanim",
+                               tr("Spud Animation (*.sanim)"));
+
+    if (file_name.length() && selected_material != nullptr)
+        if (file->getAnimation().size())
+            file->saveAnimation(file_name);
 
 }
 

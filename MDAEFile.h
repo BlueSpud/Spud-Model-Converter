@@ -18,6 +18,8 @@ class MDAEFile : public MFile {
     private:
 
         glm::mat4 parseMatrix(const std::string& string);
+        std::vector<glm::mat4> parseMatrices(const std::string& string, int count);
+
         void parseBone(MXMLNode* parent, std::vector<MBone>& bones);
 };
 

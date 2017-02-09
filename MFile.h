@@ -32,6 +32,24 @@ struct MVertex {
     glm::vec3 tangent;
     int vertex_index;
 
+    // Skinning
+    glm::vec4 bone_indicies;
+    glm::vec4 bone_weights;
+
+};
+
+/******************************************************************************
+ *  Declaration for bone struct                                              *
+ ******************************************************************************/
+
+struct MBone {
+
+    int parent_index;
+    glm::mat4 matrix;
+    glm::mat4 bind_matrix;
+
+    std::string name;
+
 };
 
 /******************************************************************************
@@ -40,6 +58,7 @@ struct MVertex {
 
 #define END_OF_FILE_TOKEN 0x00
 #define COLLISION_TOKEN 0x01
+#define SKINNED_TOKEN 0x02
 #define NEW_MATERIAL_TOKEN 0xFF
 
 /******************************************************************************
@@ -74,6 +93,7 @@ class MFile {
     protected:
 
         size_t getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord);
+        size_t getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord, glm::vec4& _bone_indicies, glm::vec4& _bone_weights);
         void calculateTangent(MIndex& index);
         void finalizeTangents();
 
@@ -84,6 +104,14 @@ class MFile {
 
         glm::vec3 mins, maxes;
         std::vector<std::vector<MIndex>> indicies;
+
+        // Data for skinning
+        bool skinned = false;
+        std::vector<std::string> bone_names;
+        std::vector<MBone> bones;
+        glm::mat4 global_bind_pos;
+
+        int findBoneNamed(const std::string& name);
 };
 
 #endif // MFILE_H

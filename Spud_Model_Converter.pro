@@ -14,10 +14,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         MMainWindow.cpp \
-    MOBJFile.cpp
+    MOBJFile.cpp \
+    MXMLParser.cpp \
+    MFile.cpp \
+    MDAEFile.cpp
 
 HEADERS  += MMainWindow.h \
-    MOBJFile.h
+    MOBJFile.h \
+    MXMLParser.h \
+    MFile.h \
+    MDAEFile.h
 
 INCLUDEPATH += glm
 

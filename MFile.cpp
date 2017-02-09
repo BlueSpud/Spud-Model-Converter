@@ -37,6 +37,42 @@ size_t MFile::getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2
 
 }
 
+size_t MFile::getVertexIndex(glm::vec3& _position, glm::vec3& _normal, glm::vec2& _tex_coord, glm::vec4& _bone_indicies, glm::vec4& _bone_weights) {
+
+    // Hash the vertex (with skinning information)
+    size_t hash = hasher(std::to_string(_position.x) + std::to_string(_position.y) + std::to_string(_position.z) +
+                         std::to_string(_normal.x) + std::to_string(_normal.y) + std::to_string(_normal.z) +
+                         std::to_string(_tex_coord.x) + std::to_string(_tex_coord.y) +
+                         std::to_string(_bone_indicies.x) + std::to_string(_bone_indicies.y) + std::to_string(_bone_indicies.z) + std::to_string(_bone_indicies.w) +
+                         std::to_string(_bone_weights.x) + std::to_string(_bone_weights.y) + std::to_string(_bone_weights.z) + std::to_string(_bone_weights.w));
+
+    if (vertices.count(hash))
+        return hash;
+
+    // Didnt find, add new vertex
+    MVertex new_vertex;
+    new_vertex.position = glm::vec3(_position);
+    new_vertex.normal = glm::vec3(_normal);
+    new_vertex.tex_coord = glm::vec2(_tex_coord);
+    new_vertex.bone_indicies = glm::vec4(_bone_indicies);
+    new_vertex.bone_weights = glm::vec4(_bone_weights);
+
+    // Check this vertex against the min and max
+    mins.x = glm::min(_position.x, mins.x);
+    mins.y = glm::min(_position.y, mins.y);
+    mins.z = glm::min(_position.z, mins.z);
+
+    maxes.x = glm::max(_position.x, maxes.x);
+    maxes.y = glm::max(_position.y, maxes.y);
+    maxes.z = glm::max(_position.z, maxes.z);
+
+    vertices[hash] = new_vertex;
+
+    return hash;
+
+
+}
+
 void MFile::calculateTangent(MIndex& index) {
 
     glm::vec3 edge1 = vertices[index.y].position - vertices[index.x].position;
@@ -164,7 +200,61 @@ void MFile::saveFile(const QString& path) {
 
         out_file_stream.close();
 
+        // If we are skinned we also write out a new file
+        if (skinned) {
+
+            std::string modified_path = path.toStdString();
+            modified_path = modified_path.replace(modified_path.length() - 5, 5, ".srig");
+
+            out_file_stream = std::ofstream(modified_path, std::ios::binary);
+
+            // Write out the global bind pose
+            out_file_stream.write((char*)&global_bind_pos, sizeof(glm::mat4));
+
+            // Write out the bones
+            unsigned int bone_count = (unsigned int)bones.size();
+            out_file_stream.write((char*)&bone_count, sizeof(unsigned int));
+
+            for (int i = 0; i < bone_count; i++) {
+
+                // Write out the parent of the bone
+                out_file_stream.write((char*)&bones[i].parent_index, sizeof(int));
+
+                // Write out the matricies, bind matrix then transform
+                out_file_stream.write((char*)&bones[i].bind_matrix, sizeof(glm::mat4));
+
+                // Write out the matricies
+                out_file_stream.write((char*)&bones[i].matrix, sizeof(glm::mat4));
+
+            }
+
+            // We dont need to write out the vertex count because we should already have it, but we do need to write out the weights
+            for (std::map<size_t, MVertex>::iterator i = vertices.begin(); i != vertices.end(); i++) {
+
+                // Write the indicies
+                out_file_stream.write((char*)&i->second.bone_indicies, sizeof(glm::vec4));
+
+                // Write out the weights
+                out_file_stream.write((char*)&i->second.bone_weights, sizeof(glm::vec4));
+
+            }
+
+            out_file_stream.close();
+
+        }
+
+
 }
 
 int MFile::getMaterialCount() { return indicies.size(); }
 MMaterial* MFile::getMaterial(int material) { return &materials[material]; }
+
+int MFile::findBoneNamed(const std::string& name) {
+
+    for (int i = 0; i < bones.size(); i++)
+        if (!name.compare(bones[i].name))
+            return i;
+
+    return -1;
+
+}

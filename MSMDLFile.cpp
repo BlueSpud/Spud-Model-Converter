@@ -18,29 +18,27 @@ void MSMDLFile::loadFile(const QString& path) {
     unsigned int vertex_count = 0;
     file.read((char*)&vertex_count, sizeof(unsigned int));
 
-    // Allocate the arrays for the data
-    glm::vec3* verts = new glm::vec3[vertex_count];
-    glm::vec3* normals = new glm::vec3[vertex_count];
-    glm::vec2* tex_coords = new glm::vec2[vertex_count];
-    glm::vec3* tangents = new glm::vec3[vertex_count];
-
     // Read the verticies
     for (int i = 0; i < vertex_count; i++) {
 
+        MVertex vertex;
+
         // Read position
-        file.read((char*)&verts[i], sizeof(glm::vec3));
+        file.read((char*)&vertex.position, sizeof(glm::vec3));
 
         // Read normal
-        file.read((char*)&normals[i], sizeof(glm::vec3));
+        file.read((char*)&vertex.normal, sizeof(glm::vec3));
 
         // Read tangent
-        file.read((char*)&tangents[i], sizeof(glm::vec3));
+        file.read((char*)&vertex.tangent, sizeof(glm::vec3));
 
         // Read tex coord
-        file.read((char*)&tex_coords[i], sizeof(glm::vec2));
+        file.read((char*)&vertex.tex_coord, sizeof(glm::vec2));
 
         // Change to convert from old to new
-        //tex_coords[i].y = 1.0 - tex_coords[i].y;
+        vertex.tex_coord.y = 1.0 - vertex.tex_coord.y;
+
+        vertices[vertices.size()] = vertex;
 
     }
 
@@ -85,14 +83,12 @@ void MSMDLFile::loadFile(const QString& path) {
                 glm::ivec3 index;
                 file.read((char*)&index, sizeof(glm::ivec3));
 
-                MIndex hashed;
-                hashed.x = getVertexIndex(verts[index.x], normals[index.x], tex_coords[index.x]);
-                hashed.y = getVertexIndex(verts[index.y], normals[index.y], tex_coords[index.y]);
-                hashed.z = getVertexIndex(verts[index.z], normals[index.z], tex_coords[index.z]);
+                MIndex index_m;
+                index_m.x = index.x;
+                index_m.y = index.y;
+                index_m.z = index.z;
 
-                calculateTangent(hashed);
-
-                material_indicies.push_back(hashed);
+                material_indicies.push_back(index_m);
 
             }
 

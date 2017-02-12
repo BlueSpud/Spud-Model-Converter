@@ -72,7 +72,7 @@ void MMainWindow::openNewFile() {
     // Open a file dialog looking for a .obj file
     QString file_to_load = QFileDialog::getOpenFileName(this, tr("Open File"),
                                                     QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).first(),
-                                                    tr("Models (*.obj *.dae)"));
+                                                    tr("Models (*.obj *.dae *.smdl)"));
 
     // Set the name of the file
     ui->file_name_label->setText(file_to_load);
@@ -87,6 +87,9 @@ void MMainWindow::openNewFile() {
 
     if (!extension.compare("dae"))
         file = new MDAEFile();
+
+    if (!extension.compare("mdl"))
+        file = new MSMDLFile();
 
     file->loadFile(file_to_load);
 

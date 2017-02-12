@@ -70,6 +70,9 @@ void MOBJFile::loadFile(const QString& path) {
                glm::vec2 t;
                sscanf(line.c_str(), "vt %f %f",&t.x,&t.y);
 
+               // Flip y for dds
+               t.y = 1.0 - t.y;
+
                _tex_coords.push_back(t);
            }
 

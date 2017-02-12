@@ -53,13 +53,15 @@ SOURCES       = ../../main.cpp \
 		../../MOBJFile.cpp \
 		../../MXMLParser.cpp \
 		../../MFile.cpp \
-		../../MDAEFile.cpp moc_MMainWindow.cpp
+		../../MDAEFile.cpp \
+		../../MSMDLFile.cpp moc_MMainWindow.cpp
 OBJECTS       = main.o \
 		MMainWindow.o \
 		MOBJFile.o \
 		MXMLParser.o \
 		MFile.o \
 		MDAEFile.o \
+		MSMDLFile.o \
 		moc_MMainWindow.o
 DIST          = /Qt/5.7/clang_64/mkspecs/features/spec_pre.prf \
 		/Qt/5.7/clang_64/mkspecs/qdevice.pri \
@@ -201,12 +203,14 @@ DIST          = /Qt/5.7/clang_64/mkspecs/features/spec_pre.prf \
 		../../MOBJFile.h \
 		../../MXMLParser.h \
 		../../MFile.h \
-		../../MDAEFile.h ../../main.cpp \
+		../../MDAEFile.h \
+		../../MSMDLFile.h ../../main.cpp \
 		../../MMainWindow.cpp \
 		../../MOBJFile.cpp \
 		../../MXMLParser.cpp \
 		../../MFile.cpp \
-		../../MDAEFile.cpp
+		../../MDAEFile.cpp \
+		../../MSMDLFile.cpp
 QMAKE_TARGET  = Spud_Model_Converter
 DESTDIR       = 
 TARGET        = Spud_Model_Converter.app/Contents/MacOS/Spud_Model_Converter
@@ -529,8 +533,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../MMainWindow.h ../../MOBJFile.h ../../MXMLParser.h ../../MFile.h ../../MDAEFile.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../main.cpp ../../MMainWindow.cpp ../../MOBJFile.cpp ../../MXMLParser.cpp ../../MFile.cpp ../../MDAEFile.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../MMainWindow.h ../../MOBJFile.h ../../MXMLParser.h ../../MFile.h ../../MDAEFile.h ../../MSMDLFile.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../main.cpp ../../MMainWindow.cpp ../../MOBJFile.cpp ../../MXMLParser.cpp ../../MFile.cpp ../../MDAEFile.cpp ../../MSMDLFile.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../MMainWindow.ui $(DISTDIR)/
 
 
@@ -565,9 +569,9 @@ moc_MMainWindow.cpp: ../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QModelIndex \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qabstractitemmodel.h \
 		../../MOBJFile.h \
+		../../MFile.h \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
-		../../MFile.h \
 		../../glm/glm/glm.hpp \
 		../../glm/glm/detail/_fixes.hpp \
 		../../glm/glm/fwd.hpp \
@@ -647,6 +651,14 @@ moc_MMainWindow.cpp: ../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers
 		../../glm/glm/integer.hpp \
 		../../glm/glm/detail/func_integer.hpp \
 		../../glm/glm/detail/func_integer.inl \
+		../../MDAEFile.h \
+		../../glm/glm/gtc/type_ptr.hpp \
+		../../glm/glm/gtc/quaternion.hpp \
+		../../glm/glm/gtc/constants.hpp \
+		../../glm/glm/gtc/constants.inl \
+		../../glm/glm/gtc/quaternion.inl \
+		../../glm/glm/gtc/type_ptr.inl \
+		../../MXMLParser.h \
 		../../MMainWindow.h \
 		../../../../Qt/5.7/clang_64/bin/moc
 	/Users/Logan/Qt/5.7/clang_64/bin/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -I/Users/Logan/Qt/5.7/clang_64/mkspecs/macx-clang -I/Users/Logan/Desktop/Spud_Model_Converter -I/Users/Logan/Desktop/Spud_Model_Converter/glm -I/Users/Logan/Qt/5.7/clang_64/lib/QtWidgets.framework/Headers -I/Users/Logan/Qt/5.7/clang_64/lib/QtGui.framework/Headers -I/Users/Logan/Qt/5.7/clang_64/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.0.0/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include -I'/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/System/Library/Frameworks (framework directory)' -F/Users/Logan/Qt/5.7/clang_64/lib ../../MMainWindow.h -o moc_MMainWindow.cpp
@@ -678,9 +690,9 @@ main.o: ../../main.cpp ../../MMainWindow.h \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QModelIndex \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qabstractitemmodel.h \
 		../../MOBJFile.h \
+		../../MFile.h \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
-		../../MFile.h \
 		../../glm/glm/glm.hpp \
 		../../glm/glm/detail/_fixes.hpp \
 		../../glm/glm/fwd.hpp \
@@ -760,6 +772,14 @@ main.o: ../../main.cpp ../../MMainWindow.h \
 		../../glm/glm/integer.hpp \
 		../../glm/glm/detail/func_integer.hpp \
 		../../glm/glm/detail/func_integer.inl \
+		../../MDAEFile.h \
+		../../glm/glm/gtc/type_ptr.hpp \
+		../../glm/glm/gtc/quaternion.hpp \
+		../../glm/glm/gtc/constants.hpp \
+		../../glm/glm/gtc/constants.inl \
+		../../glm/glm/gtc/quaternion.inl \
+		../../glm/glm/gtc/type_ptr.inl \
+		../../MXMLParser.h \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/QApplication \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/qapplication.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
@@ -770,9 +790,9 @@ MMainWindow.o: ../../MMainWindow.cpp ../../MMainWindow.h \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QModelIndex \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qabstractitemmodel.h \
 		../../MOBJFile.h \
+		../../MFile.h \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
-		../../MFile.h \
 		../../glm/glm/glm.hpp \
 		../../glm/glm/detail/_fixes.hpp \
 		../../glm/glm/fwd.hpp \
@@ -852,6 +872,14 @@ MMainWindow.o: ../../MMainWindow.cpp ../../MMainWindow.h \
 		../../glm/glm/integer.hpp \
 		../../glm/glm/detail/func_integer.hpp \
 		../../glm/glm/detail/func_integer.inl \
+		../../MDAEFile.h \
+		../../glm/glm/gtc/type_ptr.hpp \
+		../../glm/glm/gtc/quaternion.hpp \
+		../../glm/glm/gtc/constants.hpp \
+		../../glm/glm/gtc/constants.inl \
+		../../glm/glm/gtc/quaternion.inl \
+		../../glm/glm/gtc/type_ptr.inl \
+		../../MXMLParser.h \
 		ui_MMainWindow.h \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/QMessageBox \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/qmessagebox.h \
@@ -868,9 +896,9 @@ MMainWindow.o: ../../MMainWindow.cpp ../../MMainWindow.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MMainWindow.o ../../MMainWindow.cpp
 
 MOBJFile.o: ../../MOBJFile.cpp ../../MOBJFile.h \
+		../../MFile.h \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
-		../../MFile.h \
 		../../glm/glm/glm.hpp \
 		../../glm/glm/detail/_fixes.hpp \
 		../../glm/glm/fwd.hpp \
@@ -956,6 +984,8 @@ MXMLParser.o: ../../MXMLParser.cpp ../../MXMLParser.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MXMLParser.o ../../MXMLParser.cpp
 
 MFile.o: ../../MFile.cpp ../../MFile.h \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
 		../../glm/glm/glm.hpp \
 		../../glm/glm/detail/_fixes.hpp \
 		../../glm/glm/fwd.hpp \
@@ -1038,8 +1068,101 @@ MFile.o: ../../MFile.cpp ../../MFile.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MFile.o ../../MFile.cpp
 
 MDAEFile.o: ../../MDAEFile.cpp ../../MDAEFile.h \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
+		../../glm/glm/gtc/type_ptr.hpp \
+		../../glm/glm/gtc/quaternion.hpp \
+		../../glm/glm/mat3x3.hpp \
+		../../glm/glm/detail/type_mat3x3.hpp \
+		../../glm/glm/fwd.hpp \
+		../../glm/glm/detail/type_int.hpp \
+		../../glm/glm/detail/setup.hpp \
+		../../glm/glm/detail/type_float.hpp \
+		../../glm/glm/detail/type_vec.hpp \
+		../../glm/glm/detail/precision.hpp \
+		../../glm/glm/detail/type_mat.hpp \
+		../../glm/glm/detail/type_vec3.hpp \
+		../../glm/glm/detail/_swizzle.hpp \
+		../../glm/glm/detail/_swizzle_func.hpp \
+		../../glm/glm/detail/type_vec3.inl \
+		../../glm/glm/detail/type_mat3x3.inl \
+		../../glm/glm/mat4x4.hpp \
+		../../glm/glm/detail/type_mat4x4.hpp \
+		../../glm/glm/detail/type_vec4.hpp \
+		../../glm/glm/detail/type_vec4.inl \
+		../../glm/glm/detail/type_vec4_sse2.inl \
+		../../glm/glm/detail/type_vec4_avx.inl \
+		../../glm/glm/detail/type_vec4_avx2.inl \
+		../../glm/glm/detail/type_mat4x4.inl \
+		../../glm/glm/vec3.hpp \
+		../../glm/glm/vec4.hpp \
+		../../glm/glm/gtc/constants.hpp \
+		../../glm/glm/gtc/constants.inl \
+		../../glm/glm/gtc/quaternion.inl \
+		../../glm/glm/trigonometric.hpp \
+		../../glm/glm/detail/func_trigonometric.hpp \
+		../../glm/glm/detail/func_trigonometric.inl \
+		../../glm/glm/detail/_vectorize.hpp \
+		../../glm/glm/detail/type_vec1.hpp \
+		../../glm/glm/detail/type_vec1.inl \
+		../../glm/glm/detail/type_vec2.hpp \
+		../../glm/glm/detail/type_vec2.inl \
+		../../glm/glm/geometric.hpp \
+		../../glm/glm/detail/func_geometric.hpp \
+		../../glm/glm/detail/func_geometric.inl \
+		../../glm/glm/detail/func_exponential.hpp \
+		../../glm/glm/detail/func_exponential.inl \
+		../../glm/glm/detail/func_vector_relational.hpp \
+		../../glm/glm/detail/func_vector_relational.inl \
+		../../glm/glm/detail/func_common.hpp \
+		../../glm/glm/detail/_fixes.hpp \
+		../../glm/glm/detail/func_common.inl \
+		../../glm/glm/exponential.hpp \
+		../../glm/glm/vec2.hpp \
+		../../glm/glm/mat2x2.hpp \
+		../../glm/glm/detail/type_mat2x2.hpp \
+		../../glm/glm/detail/type_mat2x2.inl \
+		../../glm/glm/mat2x3.hpp \
+		../../glm/glm/detail/type_mat2x3.hpp \
+		../../glm/glm/detail/type_mat2x3.inl \
+		../../glm/glm/mat2x4.hpp \
+		../../glm/glm/detail/type_mat2x4.hpp \
+		../../glm/glm/detail/type_mat2x4.inl \
+		../../glm/glm/mat3x2.hpp \
+		../../glm/glm/detail/type_mat3x2.hpp \
+		../../glm/glm/detail/type_mat3x2.inl \
+		../../glm/glm/mat3x4.hpp \
+		../../glm/glm/detail/type_mat3x4.hpp \
+		../../glm/glm/detail/type_mat3x4.inl \
+		../../glm/glm/mat4x2.hpp \
+		../../glm/glm/detail/type_mat4x2.hpp \
+		../../glm/glm/detail/type_mat4x2.inl \
+		../../glm/glm/mat4x3.hpp \
+		../../glm/glm/detail/type_mat4x3.hpp \
+		../../glm/glm/detail/type_mat4x3.inl \
+		../../glm/glm/gtc/type_ptr.inl \
 		../../MXMLParser.h \
 		../../MFile.h \
+		../../glm/glm/glm.hpp \
+		../../glm/glm/common.hpp \
+		../../glm/glm/packing.hpp \
+		../../glm/glm/detail/func_packing.hpp \
+		../../glm/glm/detail/func_packing.inl \
+		../../glm/glm/detail/type_half.hpp \
+		../../glm/glm/detail/type_half.inl \
+		../../glm/glm/matrix.hpp \
+		../../glm/glm/detail/func_matrix.hpp \
+		../../glm/glm/detail/func_matrix.inl \
+		../../glm/glm/vector_relational.hpp \
+		../../glm/glm/integer.hpp \
+		../../glm/glm/detail/func_integer.hpp \
+		../../glm/glm/detail/func_integer.inl
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MDAEFile.o ../../MDAEFile.cpp
+
+MSMDLFile.o: ../../MSMDLFile.cpp ../../MSMDLFile.h \
+		../../MFile.h \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QString \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qstring.h \
 		../../glm/glm/glm.hpp \
 		../../glm/glm/detail/_fixes.hpp \
 		../../glm/glm/fwd.hpp \
@@ -1119,7 +1242,7 @@ MDAEFile.o: ../../MDAEFile.cpp ../../MDAEFile.h \
 		../../glm/glm/integer.hpp \
 		../../glm/glm/detail/func_integer.hpp \
 		../../glm/glm/detail/func_integer.inl
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MDAEFile.o ../../MDAEFile.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MSMDLFile.o ../../MSMDLFile.cpp
 
 moc_MMainWindow.o: moc_MMainWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MMainWindow.o moc_MMainWindow.cpp

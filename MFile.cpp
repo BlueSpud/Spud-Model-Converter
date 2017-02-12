@@ -278,7 +278,7 @@ void MFile::saveAnimation(const QString& path) {
 
 }
 
-int MFile::getMaterialCount() { return indicies.size(); }
+int MFile::getMaterialCount() { return materials.size(); }
 MMaterial* MFile::getMaterial(int material) { return &materials[material]; }
 
 int MFile::findBoneNamed(const std::string& name) {

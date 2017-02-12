@@ -6,6 +6,7 @@
 
 #include "MOBJFile.h"
 #include "MDAEFile.h"
+#include "MSMDLFile.h"
 
 namespace Ui { class MMainWindow; }
 

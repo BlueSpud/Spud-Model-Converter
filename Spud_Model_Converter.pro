@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     MOBJFile.cpp \
     MXMLParser.cpp \
     MFile.cpp \
-    MDAEFile.cpp
+    MDAEFile.cpp \
+    MSMDLFile.cpp
 
 HEADERS  += MMainWindow.h \
     MOBJFile.h \
     MXMLParser.h \
     MFile.h \
-    MDAEFile.h
+    MDAEFile.h \
+    MSMDLFile.h
 
 INCLUDEPATH += glm
 

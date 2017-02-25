@@ -183,14 +183,25 @@ void MFile::saveFile(const QString& path) {
             unsigned int collision_vertex_count = (unsigned int)collision_model->vertices.size();
             out_file_stream.write((char*)&collision_vertex_count, sizeof(unsigned int));
 
-            for (std::map<size_t, MVertex>::iterator i = collision_model->vertices.begin(); i != collision_model->vertices.end(); i++)
+            int vertex_index = 0;
+            for (std::map<size_t, MVertex>::iterator i = collision_model->vertices.begin(); i != collision_model->vertices.end(); i++) {
+
                 out_file_stream.write((char*)&i->second.position, sizeof(glm::vec3));
+                i->second.vertex_index = vertex_index;
+                vertex_index++;
+
+            }
 
             // For all the materials, write out their indieis
             out_file_stream.write((char*)&collision_model->total_face_count, sizeof(unsigned int));
             for (int i = 0; i < collision_model->indicies.size(); i++)
-                for (int j = 0; j < collision_model->indicies[i].size(); j++)
-                    out_file_stream.write((char*)&collision_model->indicies[i][j], sizeof(glm::vec3));
+                for (int j = 0; j < collision_model->indicies[i].size(); j++) {
+
+                    MIndex& hashed = indicies[i][j];
+                    glm::ivec3 unhashed = glm::ivec3(collision_model->vertices[hashed.x].vertex_index, collision_model->vertices[hashed.y].vertex_index, collision_model->vertices[hashed.z].vertex_index);
+                    out_file_stream.write((char*)&unhashed, sizeof(glm::vec3));
+
+                }
 
         }
 
